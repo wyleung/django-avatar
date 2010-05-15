@@ -24,7 +24,7 @@ except ImportError:
 from avatar import AVATAR_STORAGE_DIR, AVATAR_RESIZE_METHOD, \
                    AVATAR_MAX_AVATARS_PER_USER, AVATAR_THUMB_FORMAT, \
                    AVATAR_HASH_USERDIRNAMES, AVATAR_HASH_FILENAMES, \
-                   AVATAR_THUMB_QUALITY
+                   AVATAR_THUMB_QUALITY, AVATAR_CUSTOM_STORAGE
 
 def avatar_file_path(instance=None, filename=None, size=None, ext=None):
     tmppath = [AVATAR_STORAGE_DIR]
@@ -65,7 +65,10 @@ def find_extension(format):
 class Avatar(models.Model):
     user = models.ForeignKey(User)
     primary = models.BooleanField(default=False)
-    avatar = models.ImageField(max_length=1024, upload_to=avatar_file_path, blank=True)
+    if AVATAR_CUSTOM_STORAGE:
+	    avatar = models.ImageField(max_length=1024, storage=AVATAR_CUSTOM_STORAGE, blank=True)
+	else:
+	    avatar = models.ImageField(max_length=1024, upload_to=avatar_file_path, blank=True)
     date_uploaded = models.DateTimeField(default=datetime.datetime.now)
     
     def __unicode__(self):
